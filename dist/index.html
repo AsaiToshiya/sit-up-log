@@ -27,15 +27,19 @@
     <h2>ストリーク</h2>
     <div id="streak"></div>
     <h2>カレンダー</h2>
-    <div id="cal-heatmap"></div>
+    <div style="overflow: auto">
+      <div id="cal-heatmap"></div>
+    </div>
 
     <script src="https://unpkg.com/nostr-tools@2.5.0/lib/nostr.bundle.js"></script>
     <script type="module">
       import { getRelays } from "./relayList.js";
 
+      // 公開鍵 (16 進数)
       const pk =
         "0a2f19dc1a185792c3b0376f1d7f9971295e8932966c397935a5dddd1451a25a";
 
+      // 投稿を取得する
       const pool = new window.NostrTools.SimplePool();
       const relays = await getRelays(pool, pk);
       const events = await pool.querySync(relays, {
@@ -44,6 +48,7 @@
         "#t": ["腹筋"],
       });
 
+      // 日ごとのカウント数
       const data = events
         .sort((a, b) => b.created_at - a.created_at)
         .reduce((acc, obj) => {
@@ -61,6 +66,7 @@
           ];
         }, []);
 
+      // ストリーク
       let i = data.length ? 1 : 0;
       for (; i < data.length; i++) {
         if (
@@ -72,6 +78,7 @@
       }
       streak.innerText = i;
 
+      // カレンダー
       const cal = new CalHeatmap();
       cal.paint({
         data: { source: data, x: "date", y: "value" },
